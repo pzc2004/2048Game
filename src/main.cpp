@@ -37,25 +37,20 @@ namespace game
 		}
 		void check()
 		{
-			bool bb= 0;
 			for(int i= 0; i < 4; i++)
 			{
 				for(int j= 0; j < 4; j++)
 				{
-					if(!a[i][j])
-					{
-						bb= 1;
-						break;
-					}
+					if(!a[i][j]) return;
 					for(int no= 0; no < 4; no++)
 					{
 						int nox= i + x[no], noy= j + y[no];
 						if(nox < 0 || nox >= 4 || noy < 0 || noy >= 4) continue;
-						if(a[nox][noy] == a[i][j]) bb= 1;
+						if(a[nox][noy] == a[i][j]) return;
 					}
 				}
 			}
-			if(!bb) dead= 1;
+			dead= 1;
 		}
 		void update()
 		{
@@ -282,14 +277,6 @@ void PrintPage(Graphics &g)
 	Font fontl(L"Blackadder ITC", 48, FontStyleRegular, UnitPoint, NULL);
 	SolidBrush sbR(Color::Red), sbY(Color::Yellow);
 	SolidBrush sbNum1(Color::MakeARGB(255, 119, 110, 101)), sbNum2(Color::MakeARGB(255, 249, 246, 242));
-	// SolidBrush sb0(Color::MakeARGB(255, 205, 193, 180));
-	// SolidBrush sb2(Color::MakeARGB(255, 238, 228, 218));
-	// SolidBrush sb4(Color::MakeARGB(255, 237, 224, 220));
-	// SolidBrush sb8(Color::MakeARGB(255, 242, 177, 121));
-	// SolidBrush sb16(Color::MakeARGB(255, 245, 149, 99));
-	// SolidBrush sb32(Color::MakeARGB(255, 246, 124, 95));
-	// SolidBrush sb64(Color::MakeARGB(255, 246, 94, 59));
-	// SolidBrush sb128(Color::MakeARGB(255, 237, 207, 114));
 	switch(Page)
 	{
 		case 0:
@@ -332,7 +319,6 @@ void PrintPage(Graphics &g)
 			wchar_t s[128];
 			swprintf(s, L"Score:%d", table.score);
 			g.DrawString(s, -1, &fontl, PointF(140, 20), &sbNum1);
-			printf("%d\n", table.dead);
 			if(table.dead)
 			{
 				table.maxscore= max(table.maxscore, table.score);
@@ -413,8 +399,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 				case 83: op= 4; break;
 				default: op= 0;
 			}
-			if(Page == 1 && op && !table.dead) table.move(op);
-			PrintPage(g);
+			if(Page == 1 && op && !table.dead) table.move(op), PrintPage(g);
 			g.ReleaseHDC(hdc);
 			ReleaseDC(hwnd, hdc);
 			break;
@@ -429,7 +414,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	srand(time(0));
-	system("chcp 65001");
 	GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
