@@ -2,7 +2,6 @@
 #include <ctime>
 #include <vector>
 #include <windows.h>
-/* A useful thing */
 #include <gdiplus.h>
 using namespace std;
 using namespace Gdiplus;
@@ -16,8 +15,8 @@ namespace game
 	};
 	struct Table
 	{
-		bool dead;
-		int a[4][4], score, maxscore;
+		bool dead, back;
+		int a[4][4], score, maxscore, last[4][4];
 		vector<point> rest;
 		void insert(int x)
 		{
@@ -27,18 +26,23 @@ namespace game
 		}
 		void init()
 		{
-			memset(a, 0, sizeof(a)), dead= 0, score= 0;
-			update();
+			memset(a, 0, sizeof(a)), dead= back= 0, score= 0, update();
 			bool bb= rand() % 2;
 			if(!bb)
 				insert(2), insert(2);
 			else
 				insert(2), insert(4);
 		}
+		void withdraw()
+		{
+			if(!back || dead) return;
+			for(int i= 0; i < 4; i++)
+				for(int j= 0; j < 4; j++) a[i][j]= last[i][j];
+			back= 0;
+		}
 		void check()
 		{
 			for(int i= 0; i < 4; i++)
-			{
 				for(int j= 0; j < 4; j++)
 				{
 					if(!a[i][j]) return;
@@ -49,7 +53,6 @@ namespace game
 						if(a[nox][noy] == a[i][j]) return;
 					}
 				}
-			}
 			dead= 1;
 		}
 		void update()
@@ -66,49 +69,41 @@ namespace game
 				case 1:	 //Left
 				{
 					for(int i= 0; i < 4; i++)
-					{
 						for(int j= 1; j < 4; j++)
 						{
 							if(!a[i][j]) continue;
 							if(!a[i][j - 1] || a[i][j - 1] == a[i][j]) return 1;
 						}
-					}
 					break;
 				}
 				case 2:	 //Up
 				{
 					for(int i= 1; i < 4; i++)
-					{
 						for(int j= 0; j < 4; j++)
 						{
 							if(!a[i][j]) continue;
 							if(!a[i - 1][j] || a[i - 1][j] == a[i][j]) return 1;
 						}
-					}
 					break;
 				}
 				case 3:	 //Right
 				{
 					for(int i= 0; i < 4; i++)
-					{
 						for(int j= 0; j < 3; j++)
 						{
 							if(!a[i][j]) continue;
 							if(!a[i][j + 1] || a[i][j + 1] == a[i][j]) return 1;
 						}
-					}
 					break;
 				}
 				case 4:	 //Down
 				{
 					for(int i= 0; i < 3; i++)
-					{
 						for(int j= 0; j < 4; j++)
 						{
 							if(!a[i][j]) continue;
 							if(!a[i + 1][j] || a[i + 1][j] == a[i][j]) return 1;
 						}
-					}
 					break;
 				}
 			}
@@ -119,24 +114,21 @@ namespace game
 			check();
 			if(dead) return;
 			if(!checkmove(op)) return;
+			for(int i= 0; i < 4; i++)
+				for(int j= 0; j < 4; j++) last[i][j]= a[i][j];
+			back= 1;
 			switch(op)
 			{
 				case 1:	 //Left
 				{
 					for(int i= 0; i < 4; i++)
-					{
 						for(int j= 1; j < 4; j++)
 						{
 							if(!a[i][j]) continue;
 							int k= j;
-							while(k > 0 && !a[i][k - 1])
-							{
-								a[i][k - 1]= a[i][k], a[i][k]= 0, --k;
-							}
+							while(k > 0 && !a[i][k - 1]) a[i][k - 1]= a[i][k], a[i][k]= 0, --k;
 						}
-					}
 					for(int i= 0; i < 4; i++)
-					{
 						for(int j= 0; j < 3; j++)
 						{
 							if(!a[i][j]) continue;
@@ -147,25 +139,18 @@ namespace game
 								a[i][3]= 0;
 							}
 						}
-					}
 					break;
 				}
 				case 2:	 //Up
 				{
 					for(int j= 0; j < 4; j++)
-					{
 						for(int i= 1; i < 4; i++)
 						{
 							if(!a[i][j]) continue;
 							int k= i;
-							while(k > 0 && !a[k - 1][j])
-							{
-								a[k - 1][j]= a[k][j], a[k][j]= 0, --k;
-							}
+							while(k > 0 && !a[k - 1][j]) a[k - 1][j]= a[k][j], a[k][j]= 0, --k;
 						}
-					}
 					for(int j= 0; j < 4; j++)
-					{
 						for(int i= 0; i < 3; i++)
 						{
 							if(!a[i][j]) continue;
@@ -176,25 +161,18 @@ namespace game
 								a[3][j]= 0;
 							}
 						}
-					}
 					break;
 				}
 				case 3:	 //Right
 				{
 					for(int i= 0; i < 4; i++)
-					{
 						for(int j= 3; j >= 0; j--)
 						{
 							if(!a[i][j]) continue;
 							int k= j;
-							while(k < 3 && !a[i][k + 1])
-							{
-								a[i][k + 1]= a[i][k], a[i][k]= 0, ++k;
-							}
+							while(k < 3 && !a[i][k + 1]) a[i][k + 1]= a[i][k], a[i][k]= 0, ++k;
 						}
-					}
 					for(int i= 0; i < 4; i++)
-					{
 						for(int j= 4; j > 0; j--)
 						{
 							if(!a[i][j]) continue;
@@ -205,25 +183,18 @@ namespace game
 								a[i][0]= 0;
 							}
 						}
-					}
 					break;
 				}
 				case 4:	 //Down
 				{
 					for(int j= 0; j < 4; j++)
-					{
 						for(int i= 3; i >= 0; i--)
 						{
 							if(!a[i][j]) continue;
 							int k= i;
-							while(k < 3 && !a[k + 1][j])
-							{
-								a[k + 1][j]= a[k][j], a[k][j]= 0, ++k;
-							}
+							while(k < 3 && !a[k + 1][j]) a[k + 1][j]= a[k][j], a[k][j]= 0, ++k;
 						}
-					}
 					for(int j= 0; j < 4; j++)
-					{
 						for(int i= 4; i > 0; i--)
 						{
 							if(!a[i][j]) continue;
@@ -234,18 +205,13 @@ namespace game
 								a[0][j]= 0;
 							}
 						}
-					}
 					break;
 				}
 			}
 			update();
 			int x= rand() % 10;
-			if(x == 0)
-				insert(4);
-			else
-				insert(2);
+			insert(x == 0 ? 4 : 2);
 			check();
-			if(dead) return;
 		}
 	};
 }  // namespace game
@@ -336,8 +302,10 @@ void PrintPage(Graphics &g)
 					g.DrawRectangle(&penB, 100 + 80 * j, 100 + 80 * i, 80, 80);
 				}
 			}
-			g.FillRectangle(&sbY, 480, 320, 120, 50);
+			g.FillRectangle(&sbY, 480, 320, 130, 50);
 			g.DrawString(L"Restart", -1, &fonts, PointF(490, 325), &sbR);
+			g.FillRectangle(&sbY, 480, 240, 130, 50);
+			g.DrawString(L"Withdraw", -1, &fonts, PointF(480, 245), &sbR);
 			wchar_t s[128];
 			swprintf(s, L"Score:%d", table.score);
 			g.DrawString(s, -1, &fontl, PointF(140, 20), &sbNum1);
@@ -368,9 +336,14 @@ void Click(HWND hwnd, int x, int y)
 		}
 		case 1:
 		{
-			if(x >= 480 && x <= 600 && y >= 320 && y <= 370)
+			if(x >= 480 && x <= 610 && y >= 320 && y <= 370)
 			{
 				Page= 0;
+				PrintPage(g);
+			}
+			if(x >= 480 && x <= 610 && y >= 240 && y <= 290)
+			{
+				table.withdraw();
 				PrintPage(g);
 			}
 			break;
