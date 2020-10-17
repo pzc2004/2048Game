@@ -254,19 +254,32 @@ Table table;
 int Page;
 PAINTSTRUCT ps;
 Color numColor[64]= {
-	Color::MakeARGB(255, 205, 193, 180),
-	Color::MakeARGB(255, 238, 228, 218),
-	Color::MakeARGB(255, 237, 224, 220),
-	Color::MakeARGB(255, 242, 177, 121),
-	Color::MakeARGB(255, 245, 149, 99),
-	Color::MakeARGB(255, 246, 124, 95),
-	Color::MakeARGB(255, 246, 94, 59),
-	Color::MakeARGB(255, 237, 207, 114),
-	Color::MakeARGB(255, 237, 204, 97),
-	Color::MakeARGB(255, 236, 200, 80),
-	Color::MakeARGB(255, 237, 196, 62),
-	Color::MakeARGB(255, 237, 194, 46),
-	// Color::MakeARGB(255,),
+	Color::MakeARGB(255, 205, 193, 180),  //0
+	Color::MakeARGB(255, 238, 228, 218),  //2
+	Color::MakeARGB(255, 237, 224, 220),  //4
+	Color::MakeARGB(255, 242, 177, 121),  //8
+	Color::MakeARGB(255, 245, 149, 99),	  //16
+	Color::MakeARGB(255, 246, 124, 95),	  //32
+	Color::MakeARGB(255, 246, 94, 59),	  //64
+	Color::MakeARGB(255, 237, 207, 114),  //128
+	Color::MakeARGB(255, 237, 204, 97),	  //256
+	Color::MakeARGB(255, 236, 200, 80),	  //512
+	Color::MakeARGB(255, 237, 196, 62),	  //1024
+	Color::MakeARGB(255, 237, 194, 46),	  //2048
+};
+pair<int, int> numplace[64]= {
+	{115, 93},	 //0
+	{115, 93},	 //2
+	{115, 93},	 //4
+	{115, 93},	 //8
+	{107, 93},	 //16
+	{107, 93},	 //32
+	{107, 93},	 //64
+	{100, 93},	 //128
+	{100, 93},	 //256
+	{100, 93},	 //512
+	{105, 105},	 //1024
+	{100, 105},	 //2048
 };
 void PrintPage(Graphics &g)
 {
@@ -303,13 +316,22 @@ void PrintPage(Graphics &g)
 					if(table.a[i][j])
 					{
 						sb.SetColor(numColor[(int)log2(table.a[i][j])]);
+						if(table.a[i][j] <= 512)
+							font= &fontl;
+						else
+							font= &fontm;
 					}
 					g.FillRectangle(&sb, 100 + 80 * j, 100 + 80 * i, 80, 80);
 					if(table.a[i][j])
 					{
 						wchar_t s[128];
 						swprintf(s, L"%d", table.a[i][j]);
-						g.DrawString(s, -1, &fontl, PointF(100 + 80 * j, 93 + 80 * i), &(table.a[i][j] < 8 ? sbNum1 : sbNum2));
+						g.DrawString(s,
+									 -1,
+									 font,
+									 PointF(numplace[(int)log2(table.a[i][j])].first + 80 * j,
+											numplace[(int)log2(table.a[i][j])].second + 80 * i),
+									 &(table.a[i][j] < 8 ? sbNum1 : sbNum2));
 					}
 					g.DrawRectangle(&penB, 100 + 80 * j, 100 + 80 * i, 80, 80);
 				}
