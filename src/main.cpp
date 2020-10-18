@@ -27,6 +27,11 @@ namespace game
 		void init()
 		{
 			memset(a, 0, sizeof(a)), dead= back= 0, score= 0, update();
+#ifdef _2048_DEBUG
+			a[0][0]=2048, a[0][1]=1024, a[0][2]=512, a[0][3]=256;
+			a[1][3]=128, a[1][2]=64, a[1][1]=32, a[1][0]=16;
+			a[2][0]=8, a[2][1]=4, a[2][2]=2, a[2][3]=2;
+#endif // _2048_DEBUG
 			bool bb= rand() % 2;
 			if(!bb)
 				insert(2), insert(2);
@@ -256,6 +261,9 @@ void PrintPage(Graphics &g)
 	Font fontl(L"Blackadder ITC", 48, FontStyleRegular, UnitPoint, NULL);
 	SolidBrush sbR(Color::Red), sbY(Color::Yellow);
 	SolidBrush sbNum1(Color::MakeARGB(255, 119, 110, 101)), sbNum2(Color::MakeARGB(255, 249, 246, 242));
+	StringFormat sfCenter;
+	sfCenter.SetAlignment(StringAlignment::StringAlignmentCenter);
+	sfCenter.SetLineAlignment(StringAlignment::StringAlignmentCenter);
 	switch(Page)
 	{
 		case 0:
@@ -278,26 +286,20 @@ void PrintPage(Graphics &g)
 				for(int j= 0; j < 4; j++)
 				{
 					SolidBrush sb(numColor[0]);
-					Font *font;
 					if(table.a[i][j])
 					{
 						sb.SetColor(numColor[(int)log2(table.a[i][j])]);
-						if(table.a[i][j] <= 512)
-							font= &fontl;
-						else
-							font= &fontm;
 					}
 					g.FillRectangle(&sb, 100 + 80 * j, 100 + 80 * i, 80, 80);
 					if(table.a[i][j])
 					{
 						wchar_t s[128];
 						swprintf(s, L"%d", table.a[i][j]);
-						g.DrawString(s,
-									 -1,
-									 font,
-									 PointF(numplace[(int)log2(table.a[i][j])].first + 80 * j,
-											numplace[(int)log2(table.a[i][j])].second + 80 * i),
-									 &(table.a[i][j] < 8 ? sbNum1 : sbNum2));
+
+						int tmpFS = 48.01564027f - 0.07820137 * table.a[i][j];
+						Font font(L"Blackadder ITC", max(32,tmpFS), FontStyleRegular, UnitPoint, NULL);
+						RectF r(100 + 80 * j, 100 + 80 * i, 80, 80);
+						g.DrawString(s, -1, &font, r, &sfCenter, &(table.a[i][j] < 8 ? sbNum1 : sbNum2));
 					}
 					g.DrawRectangle(&penB, 100 + 80 * j, 100 + 80 * i, 80, 80);
 				}
