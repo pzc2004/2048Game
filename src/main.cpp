@@ -28,10 +28,10 @@ namespace game
 		{
 			memset(a, 0, sizeof(a)), dead= back= 0, score= 0, update();
 #ifdef _2048_DEBUG
-			a[0][0]=2048, a[0][1]=1024, a[0][2]=512, a[0][3]=256;
-			a[1][3]=128, a[1][2]=64, a[1][1]=32, a[1][0]=16;
-			a[2][0]=8, a[2][1]=4, a[2][2]=2, a[2][3]=2;
-#endif // _2048_DEBUG
+			a[0][0]= 2048, a[0][1]= 1024, a[0][2]= 512, a[0][3]= 256;
+			a[1][3]= 128, a[1][2]= 64, a[1][1]= 32, a[1][0]= 16;
+			a[2][0]= 8, a[2][1]= 4, a[2][2]= 2, a[2][3]= 2;
+#endif	// _2048_DEBUG
 			bool bb= rand() % 2;
 			if(!bb)
 				insert(2), insert(2);
@@ -238,20 +238,6 @@ Color numColor[64]= {
 	Color::MakeARGB(255, 237, 196, 62),	  //1024
 	Color::MakeARGB(255, 237, 194, 46),	  //2048
 };
-pair<int, int> numplace[64]= {
-	{115, 93},	 //0
-	{115, 93},	 //2
-	{115, 93},	 //4
-	{115, 93},	 //8
-	{107, 93},	 //16
-	{107, 93},	 //32
-	{107, 93},	 //64
-	{100, 93},	 //128
-	{100, 93},	 //256
-	{100, 93},	 //512
-	{105, 105},	 //1024
-	{100, 105},	 //2048
-};
 void PrintPage(Graphics &g)
 {
 	g.Clear(Color::White);
@@ -295,9 +281,8 @@ void PrintPage(Graphics &g)
 					{
 						wchar_t s[128];
 						swprintf(s, L"%d", table.a[i][j]);
-
-						int tmpFS = 48.01564027f - 0.07820137 * table.a[i][j];
-						Font font(L"Blackadder ITC", max(32,tmpFS), FontStyleRegular, UnitPoint, NULL);
+						int tmpFS= 48.01564027f - 0.07820137 * table.a[i][j];
+						Font font(L"Blackadder ITC", max(32, tmpFS), FontStyleRegular, UnitPoint, NULL);
 						RectF r(100 + 80 * j, 100 + 80 * i, 80, 80);
 						g.DrawString(s, -1, &font, r, &sfCenter, &(table.a[i][j] < 8 ? sbNum1 : sbNum2));
 					}
