@@ -114,11 +114,11 @@ namespace game
 			}
 			return 0;
 		}
-		void move(int op)
+		bool move(int op)
 		{
 			check();
-			if(dead) return;
-			if(!checkmove(op)) return;
+			if(dead) return 0;
+			if(!checkmove(op)) return 0;
 			for(int i= 0; i < 4; i++)
 				for(int j= 0; j < 4; j++) last[i][j]= a[i][j];
 			back= 1;
@@ -217,6 +217,7 @@ namespace game
 			int x= rand() % 10;
 			insert(x == 0 ? 4 : 2);
 			check();
+			return 1;
 		}
 	};
 }  // namespace game
@@ -381,7 +382,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 				case 83: op= 4; break;
 				default: op= 0;
 			}
-			if(Page == 1 && op && !table.dead) table.move(op), PrintPage(g);
+			if(Page == 1 && op && !table.dead && table.move(op)) PrintPage(g);
 			g.ReleaseHDC(hdc);
 			ReleaseDC(hwnd, hdc);
 			break;
